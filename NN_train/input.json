@@ -1,0 +1,69 @@
+{
+    "model": {
+        "type_map": [
+            "S"
+        ],
+        "descriptor": {
+	    "type":		"se_atten",
+	    "sel":		90,
+	    "rcut_smth":	0.50,
+	    "rcut":		7.50,
+	    "neuron":		[30, 60, 120],
+	    "resnet_dt":	false,
+	    "axis_neuron":	16,
+                "seed": 1,
+		"attn":		128,
+		"attn_layer":	3,
+		"attn_dotr": 	true,
+		"attn_mask": 	false,
+	    "_comment":		" that's all"
+	},
+         "fitting_net": {
+            "neuron": [
+              240,
+              240,
+              240,
+              240
+            ],
+            "resnet_dt": true,
+            "seed": 884
+}
+        },
+    "learning_rate": {
+        "type": "exp",
+        "start_lr": 0.001,
+        "scale_by_worker": "sqrt",
+        "decay_steps": 15000,
+        "stop_lr": 3.51e-08
+    },
+    "loss": {
+        "start_pref_e": 0.01,
+        "limit_pref_e": 5,
+        "start_pref_f": 1000,
+        "limit_pref_f": 1,
+        "start_pref_v": 0.00,
+        "limit_pref_v": 0.00
+    },
+    "training": {
+        "set_prefix": "set",
+        "stop_batch": 3000000,
+        "disp_file": "lcurve.out",
+        "disp_freq": 2000,
+        "numb_test": 5,
+        "save_freq": 2000,
+        "save_ckpt": "model.ckpt",
+        "disp_training": true,
+        "time_training": true,
+        "profiling": false,
+        "profiling_file": "timeline.json",
+        "systems": [
+            "/users/ymanyi/S_system_home/Training_dataset/data.init/half_raw_files",
+            "/users/ymanyi/S_system_home/Training_dataset/data.iters/half_raw_files"
+            ],
+             "batch_size": [
+                 8,
+                 8
+        ],
+         "seed": 1519
+    }
+}

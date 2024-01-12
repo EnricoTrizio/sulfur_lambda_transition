@@ -1,0 +1,65 @@
+variable p_id world ".0." # ".1."   ".2."  ".3."
+variable        NSTEPS1           equal 100000
+variable        NSTEPS2          equal 800000 # 0.9 ns 
+variable        THERMO_FREQ     equal 2000
+variable        aveStep1        equal 500
+variable        aveStep2        equal 1000000
+variable        DUMP_FREQ       equal 5
+variable        TEMP            equal 432
+#variable        PRE             equal 3000
+variable	SEED1      world  19168 # 5616  28175  31780
+variable	SEED2       world 14995 # 14512 22650 22096
+variable        TAU_T           equal 0.05
+variable        TAU_P           equal 0.25
+
+units           metal
+boundary        p p p
+
+restart 100000 lmp${p_id}restart
+atom_style      atomic
+neigh_modify    delay 10 every 1
+
+#read_restart    restart${p_id}end
+read_data      S8_512.lmp
+mass    1       32.065
+
+pair_style deepmd  ./deepmd_model.pb 
+
+pair_coeff * *
+
+# TIMESTEP
+timestep	0.001  #ps 
+thermo          ${DUMP_FREQ}
+thermo_style    custom step temp pe ke etotal density press vol lx ly lz xy xz yz
+thermo_modify 	flush yes
+
+# DUMP
+#dump            myDump all xyz ${DUMP_FREQ} dump${p_id}xyz
+#dump_modify     myDump append yes element S
+dump            myDump3 all atom ${DUMP_FREQ} dump${p_id}lammpstrj
+dump_modify     myDump3 append yes
+
+###RDF
+#compute 0 all rdf 100 1 1
+#fix 0 all ave/time ${THERMO_FREQ} ${aveStep1} ${aveStep2} c_0[*] file RDF.dat mode vector
+
+# run- NVT
+reset_timestep 0
+velocity        all create ${TEMP} ${SEED1} dist gaussian
+fix pl all plumed plumedfile plumed.dat outfile p.log
+fix             2 all nve
+fix             3 all temp/csvr ${TEMP} ${TEMP} ${TAU_T} ${SEED2}
+#fix             2 all nph iso ${PRE} ${PRE} ${TAU_P}
+#fix             3 all temp/csvr ${TEMP} ${TEMP} ${TAU_T} ${SEED2}
+run             ${NSTEPS2}
+
+unfix pl
+unfix 2
+unfix 3
+# ---------- End --------------------- 
+write_restart  restart${p_id}end
+
+
+
+
+
